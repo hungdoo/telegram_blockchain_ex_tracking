@@ -80,7 +80,7 @@ def get_authenticated_connection():
 
     logg.debug(result)
 
-def analyse_px(channel):
+def analyse_price(channel):
     if len(channel.results):
         price = json.loads(channel.results.pop(0))['price']
 
@@ -172,12 +172,12 @@ def main():
         while True:
             # Obtain & analyse price info
             subscribe(px_channel)
-            analyse_px(px_channel)
+            analyse_price(px_channel)
 
             # Listen & conduct commands sent from telegram
             do_command(command)
             
-            time.sleep(2)
+            time.sleep(5)
 
     except KeyboardInterrupt as e:
         logg.warning('main - KeyboardInterrupt')
