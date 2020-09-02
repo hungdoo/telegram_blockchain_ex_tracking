@@ -2,15 +2,18 @@ import logging
 
 # Create a custom logger
 logger = None
-def get_logger(name):
+def get_logger(name=None):
     global logger 
+    if logger is not None:
+        return logger
+
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
     # Create handlers
     c_handler = logging.StreamHandler()
     f_handler = logging.FileHandler('%s.log' % name)
-    c_handler.setLevel(logging.DEBUG)
+    c_handler.setLevel(logging.INFO)
     f_handler.setLevel(logging.DEBUG)
 
     # Create formatters and add it to handlers
