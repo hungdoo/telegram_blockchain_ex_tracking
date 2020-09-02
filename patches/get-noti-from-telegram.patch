@@ -1,0 +1,46 @@
+diff --git a/alert/alert.go b/alert/alert.go
+index 81cf21c..55a3e36 100644
+--- a/alert/alert.go
++++ b/alert/alert.go
+@@ -85,7 +85,7 @@ func ToTelegram(w http.ResponseWriter, r *http.Request) {
+ 			telegramMsg += "Started: " + alert.StartsAt.Format(timeDateFormat)
+ 		}
+ 
+-		msg := botapi.NewMessage(-chatID, telegramMsg)
++		msg := botapi.NewMessage(chatID, telegramMsg)
+ 		bot.Send(msg)
+ 	}
+ 
+@@ -93,3 +93,20 @@ func ToTelegram(w http.ResponseWriter, r *http.Request) {
+ 	json.NewEncoder(w).Encode(alerts)
+ 
+ }
++
++// FromTelegram function responsible to receive msg from telegram
++func FromTelegram(w http.ResponseWriter, r *http.Request) {
++
++	bot, err := botapi.NewBotAPI(botToken)
++	if err != nil {
++		log.Panic(err)
++	}
++
++	var updateConf botapi.UpdateConfig
++
++	updateConf.Timeout = 50
++	updateConf.Offset = -1
++	updates, err := bot.GetUpdates(updateConf)
++
++	json.NewEncoder(w).Encode(updates)
++}
+diff --git a/main.go b/main.go
+index d7f8b24..ab72253 100644
+--- a/main.go
++++ b/main.go
+@@ -12,6 +12,7 @@ func main() {
+ 
+ 	router := mux.NewRouter()
+ 	router.HandleFunc("/alert", alert.ToTelegram).Methods("POST")
++	router.HandleFunc("/noti", alert.FromTelegram).Methods("GET")
+ 
+ 	log.Fatal(http.ListenAndServe("0.0.0.0:9229", router))
+ }
