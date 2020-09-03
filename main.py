@@ -117,6 +117,7 @@ def do_command(command):
 
             if command.type == tele_command.UPDATE_REF:
                 REFERENCE = command.value
+                SEEN_REF = False
                 send_alert([make_alert('Ref updated: {}'.format(REFERENCE))])
                 
             elif command.type == tele_command.UPDATE_OFFSET:
@@ -140,6 +141,7 @@ def do_command(command):
 
             elif command.type == tele_command.ALERT_AT:
                 ALERT_TARGET = command.value
+                SEEN_ALERT = False
                 send_alert([make_alert('Alert updated: {}'.format(ALERT_TARGET))])
                 
             elif command.type == tele_command.LIST_CMD:
