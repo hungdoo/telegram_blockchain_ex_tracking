@@ -6,6 +6,7 @@ logg = get_logger()
 
 # Const
 UPDATE_REF = 'update_ref'
+UPDATE_OFFSET = 'update_offset'
 ALERT_AT = 'alert_at'
 GET_PRICE_5M = 'get_price_5m'
 GET_PRICE_1D = 'get_price_1d'
@@ -17,6 +18,7 @@ GET_INFO = 'get_info'
 VALID_COMMANDS = {
     # Command: value type
     UPDATE_REF: float, # Update reference/target value
+    UPDATE_OFFSET: float, # Update PX_OFFSET_PERCENT value
     ALERT_AT: float, # Alert at specific price
     CONT_REF: None, # Clear SEEN flag to cont. receiving Change price
     CONT_ALERT: None, # Clear SEEN flag to cont. receiving Alert price
