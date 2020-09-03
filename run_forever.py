@@ -14,24 +14,29 @@ args = parser.parse_args()
 
 logg = get_logger('ws_trade')
 
-while True:
-    try:
-        logg.info("Run Forever: Starting {} and {}".format(args.py, args.go))
-        p_py = Popen("python " + args.py, shell=True)
-        p_go = Popen("./" + args.go, shell=True)
-        p_py.wait()
-        p_go.wait()
+try:
+    logg.info("Run Forever: Starting {} and {}".format(args.py, args.go))
+    p_go = Popen("./" + args.go, shell=True)
+    time.sleep(2)
+    p_py = Popen("python " + args.py, shell=True)
+    while True:
+        if p_py.poll():
+            logg.info('Restart Python app')
+            p_py = Popen("python " + args.py, shell=True)
+        if p_go.poll():
+            logg.info('Restart Go app')
+            p_go = Popen("./" + args.go, shell=True)
 
         time.sleep(args.interval)
 
-    except KeyboardInterrupt as e:
-        logg.warning('Run Forever: KeyboardInterrupt. Terminate proc {} & {}'.format(p_py.pid, p_go.pid))
-        p_py.kill()
-        p_py.terminate()
-        p_py.wait()
-        p_go.kill()
-        p_go.terminate()
-        p_go.wait()
-        logg.warning('Run Forever: KeyboardInterrupt. Proc terminated {} & {}'.format(p_py.pid, p_go.pid))
+except KeyboardInterrupt as e:
+    logg.warning('Run Forever: KeyboardInterrupt. Terminate proc {} & {}'.format(p_py.pid, p_go.pid))
+    p_py.kill()
+    p_py.terminate()
+    p_py.wait()
+    p_go.kill()
+    p_go.terminate()
+    p_go.wait()
+    logg.warning('Run Forever: KeyboardInterrupt. Proc terminated {} & {}'.format(p_py.pid, p_go.pid))
 
-        sys.exit(0)
+    sys.exit(0)
