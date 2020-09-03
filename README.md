@@ -13,4 +13,4 @@ go clean && go build && ./alertmanager-webhook-telegram-go
 
 ## Run
 
-`python main.py`
+`./run_forever.py --py main.py --go alertmanager-webhook-telegram-go`
