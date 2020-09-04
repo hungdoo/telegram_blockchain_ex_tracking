@@ -17,6 +17,7 @@ go clean && go build && ./alertmanager-webhook-telegram-go
 
 ## Telegram commands
 
+```bash
 ls; # List available commands 
 get_info; # Get info about btc reference point, price change offset, alert trigger, etc. 
 update_ref;<value>
@@ -28,3 +29,4 @@ cont_alert; # Continue alerting
 
 get_price_5m; # Get latest price block in 5-min period
 get_price_1d; # Get latest price block in 1-day period
+```
