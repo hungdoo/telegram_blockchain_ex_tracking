@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # 
 
 from subprocess import Popen
@@ -18,11 +18,11 @@ try:
     logg.info("Run Forever: Starting {} and {}".format(args.py, args.go))
     p_go = Popen("./" + args.go, shell=True)
     time.sleep(2)
-    p_py = Popen("python " + args.py, shell=True)
+    p_py = Popen("python3 " + args.py, shell=True)
     while True:
         if p_py.poll():
             logg.info('Restart Python app')
-            p_py = Popen("python " + args.py, shell=True)
+            p_py = Popen("python3 " + args.py, shell=True)
         if p_go.poll():
             logg.info('Restart Go app')
             p_go = Popen("./" + args.go, shell=True)
