@@ -83,9 +83,9 @@ def get_authenticated_connection():
 def analyse_price(channel):
     if len(channel.results):
         price = json.loads(channel.results.pop(0))['price']
+        global isALERTED, REFERENCE
 
         # Check target alert (fluctuation 10/11800)
-        global isALERTED
         if not isALERTED and abs(1 - price[4] / ALERT_TARGET) < 10/11800:
             logg.warning('Target price reached: tg/cr {}/{}'.format(ALERT_TARGET, price[4]))
             send_alert([make_alert('Target price reached: tg/cr {}/{}'.format(ALERT_TARGET, price[4]))])
@@ -96,12 +96,12 @@ def analyse_price(channel):
         change = 100 - 100 * price[4] / REFERENCE
         if change > PX_OFFSET_PERCENT:
             logg.warning('Price dropped {:.2f}% from {}: {}'.format(change, REFERENCE, price[1:5]))
+            REFERENCE = price[4]
             send_alert([make_alert('Price dropped {:.2f}% from {}: {}'.format(change, REFERENCE, price[1:]))])
-            PX_OFFSET_PERCENT += 1.0
         elif change < -PX_OFFSET_PERCENT:
             logg.warning('Price rised {:.2f}% from {}: {}'.format(-change, REFERENCE, price[1:5]))
+            REFERENCE = price[4]
             send_alert([make_alert('Price rised {:.2f}% from {}: {}'.format(-change, REFERENCE, price[1:]))])
-            PX_OFFSET_PERCENT += 1.0
         else:
             pass
 
