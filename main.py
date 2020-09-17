@@ -17,8 +17,7 @@ ws = None
 
 REFERENCE = 11800
 ALERT_TARGET = 11800
-SEEN_ALERT = False
-SEEN_REF = False
+isALERTED = False
 PX_OFFSET_PERCENT = 1
 
 class Channel:
@@ -86,30 +85,29 @@ def analyse_price(channel):
         price = json.loads(channel.results.pop(0))['price']
 
         # Check target alert (fluctuation 10/11800)
-        global SEEN_ALERT
-        if not SEEN_ALERT and abs(1 - price[4] / ALERT_TARGET) < 10/11800:
+        global isALERTED
+        if not isALERTED and abs(1 - price[4] / ALERT_TARGET) < 10/11800:
             logg.warning('Target price reached: tg/cr {}/{}'.format(ALERT_TARGET, price[4]))
             send_alert([make_alert('Target price reached: tg/cr {}/{}'.format(ALERT_TARGET, price[4]))])
-            SEEN_ALERT = True
+            isALERTED = True
 
 
         # Evaluate changes
         change = 100 - 100 * price[4] / REFERENCE
-        global SEEN_REF
-        if not SEEN_REF and change > PX_OFFSET_PERCENT:
+        if change > PX_OFFSET_PERCENT:
             logg.warning('Price dropped {:.2f}% from {}: {}'.format(change, REFERENCE, price[1:5]))
             send_alert([make_alert('Price dropped {:.2f}% from {}: {}'.format(change, REFERENCE, price[1:]))])
-            SEEN_REF = True
-        elif not SEEN_REF and change < -PX_OFFSET_PERCENT:
+            PX_OFFSET_PERCENT += 1.0
+        elif change < -PX_OFFSET_PERCENT:
             logg.warning('Price rised {:.2f}% from {}: {}'.format(-change, REFERENCE, price[1:5]))
             send_alert([make_alert('Price rised {:.2f}% from {}: {}'.format(-change, REFERENCE, price[1:]))])
-            SEEN_REF = True
+            PX_OFFSET_PERCENT += 1.0
         else:
             pass
 
 def do_command(command):
     try:
-        global REFERENCE, PX_OFFSET_PERCENT, SEEN_REF, SEEN_ALERT, ALERT_TARGET
+        global REFERENCE, PX_OFFSET_PERCENT, isALERTED, ALERT_TARGET
 
         tele_command.get_latest_command_from_telegram(command)
         if command.is_new:
@@ -117,12 +115,11 @@ def do_command(command):
 
             if command.type == tele_command.UPDATE_REF:
                 REFERENCE = command.value
-                SEEN_REF = False
+                PX_OFFSET_PERCENT = 1.0
                 send_alert([make_alert('Ref updated: {}'.format(REFERENCE))])
                 
             elif command.type == tele_command.UPDATE_OFFSET:
                 PX_OFFSET_PERCENT = command.value
-                SEEN_REF = False
                 send_alert([make_alert('Offset updated: {}%'.format(PX_OFFSET_PERCENT))])
 
             elif command.type == tele_command.GET_PRICE_5M:
@@ -141,21 +138,15 @@ def do_command(command):
 
             elif command.type == tele_command.ALERT_AT:
                 ALERT_TARGET = command.value
-                SEEN_ALERT = False
+                isALERTED = False
                 send_alert([make_alert('Alert updated: {}'.format(ALERT_TARGET))])
                 
             elif command.type == tele_command.LIST_CMD:
                 send_alert([make_alert(', '.join(tele_command.VALID_COMMANDS.keys()))])
                 
-            elif command.type == tele_command.CONT_ALERT:
-                SEEN_ALERT = False
-
-            elif command.type == tele_command.CONT_REF:
-                SEEN_REF = False
-
             elif command.type == tele_command.GET_INFO:
-                send_alert([make_alert('Ref/offset/seen:{}/{}%/{}, Alert/seen:{}/{}'.format(
-                            REFERENCE, PX_OFFSET_PERCENT, SEEN_REF, ALERT_TARGET, SEEN_ALERT))])
+                send_alert([make_alert('Ref/offset:{}/{}%, Alert:{}'.format(
+                            REFERENCE, PX_OFFSET_PERCENT, ALERT_TARGET))])
 
             else:
                 pass

@@ -11,8 +11,6 @@ ALERT_AT = 'alert_at'
 GET_PRICE_5M = 'get_price_5m'
 GET_PRICE_1D = 'get_price_1d'
 LIST_CMD = 'ls'
-CONT_ALERT = 'cont_alert'
-CONT_REF = 'cont_ref'
 GET_INFO = 'get_info'
 
 VALID_COMMANDS = {
@@ -20,8 +18,6 @@ VALID_COMMANDS = {
     UPDATE_REF: float, # Update reference/target value
     UPDATE_OFFSET: float, # Update PX_OFFSET_PERCENT value
     ALERT_AT: float, # Alert at specific price
-    CONT_REF: None, # Clear SEEN flag to cont. receiving Change price
-    CONT_ALERT: None, # Clear SEEN flag to cont. receiving Alert price
     GET_PRICE_5M: None, # Get current price 5 min
     GET_PRICE_1D: None, # Get current price 1 day
     LIST_CMD: None, # List all avail. commands

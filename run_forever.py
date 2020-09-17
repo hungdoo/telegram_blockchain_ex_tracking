@@ -7,8 +7,8 @@ from logger import get_logger
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--py", type=str, help="Python application file")
-parser.add_argument("--go", type=str, help="Golang application file")
+parser.add_argument("--py", type=str, required=True, help="Python application file")
+parser.add_argument("--go", type=str, required=True, help="Golang application file")
 parser.add_argument("-i", "--interval", type=int, default=5, help="Wait interval before restarting")
 args = parser.parse_args()
 
