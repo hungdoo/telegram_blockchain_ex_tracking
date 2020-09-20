@@ -96,12 +96,12 @@ def analyse_price(channel):
         change = 100 - 100 * price[4] / REFERENCE
         if change > PX_OFFSET_PERCENT:
             logg.warning('Price dropped {:.2f}% from {}: {}'.format(change, REFERENCE, price[1:5]))
-            REFERENCE = price[4]
             send_alert([make_alert('Price dropped {:.2f}% from {}: {}'.format(change, REFERENCE, price[1:]))])
+            REFERENCE = price[4]
         elif change < -PX_OFFSET_PERCENT:
             logg.warning('Price rised {:.2f}% from {}: {}'.format(-change, REFERENCE, price[1:5]))
-            REFERENCE = price[4]
             send_alert([make_alert('Price rised {:.2f}% from {}: {}'.format(-change, REFERENCE, price[1:]))])
+            REFERENCE = price[4]
         else:
             pass
 
