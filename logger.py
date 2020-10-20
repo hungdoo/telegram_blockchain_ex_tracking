@@ -13,7 +13,7 @@ def get_logger(name=None):
     # Create handlers
     c_handler = logging.StreamHandler()
     f_handler = logging.FileHandler('%s.log' % name)
-    c_handler.setLevel(logging.INFO)
+    c_handler.setLevel(logging.DEBUG)
     f_handler.setLevel(logging.DEBUG)
 
     # Create formatters and add it to handlers
@@ -24,7 +24,7 @@ def get_logger(name=None):
 
     # Add handlers to the logger
     logger.addHandler(c_handler)
-    logger.addHandler(f_handler)
+    # logger.addHandler(f_handler)
 
     return logger
 

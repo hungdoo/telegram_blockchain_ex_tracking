@@ -5,23 +5,29 @@ from logger import get_logger
 logg = get_logger()
 
 # Const
-UPDATE_REF = 'update_ref'
-UPDATE_OFFSET = 'update_offset'
-ALERT_AT = 'alert_at'
-GET_PRICE_5M = 'get_price_5m'
-GET_PRICE_1D = 'get_price_1d'
+UPDATE_REF = 'upBTCRef'
+UPDATE_OFFSET = 'upBTCOffset'
+ALERT_AT = 'alertBTCAt'
+ALERT_GOLD_AT = 'alertGoldAt'
+GET_PRICE = 'getBTC'
 LIST_CMD = 'ls'
-GET_INFO = 'get_info'
+GET_INFO = 'getInfo'
+GET_GOLD = 'getGold'
+UPDATE_GOLD_REF = 'upGoldRef'
+UPDATE_GOLD_OFFSET = 'upGoldOffset'
 
 VALID_COMMANDS = {
     # Command: value type
     UPDATE_REF: float, # Update reference/target value
-    UPDATE_OFFSET: float, # Update PX_OFFSET_PERCENT value
+    UPDATE_OFFSET: float, # Update BTC PX_OFFSET_PERCENT value
     ALERT_AT: float, # Alert at specific price
-    GET_PRICE_5M: None, # Get current price 5 min
-    GET_PRICE_1D: None, # Get current price 1 day
+    ALERT_GOLD_AT: float, # Alert at specific price
+    GET_PRICE: None, # Get current BTC price 5 min
     LIST_CMD: None, # List all avail. commands
     GET_INFO: None, # List all avail. commands
+    GET_GOLD: None, # Get current GOLD price
+    UPDATE_GOLD_REF: float, # Update reference/target value
+    UPDATE_GOLD_OFFSET: float, # Update Gold PX_OFFSET_PERCENT value
 }
 
 class Command():
@@ -46,7 +52,7 @@ def get_latest_command_from_telegram(command):
         # Check command syntax
         text = care_item['message']['text']
         if ';' in text:
-            cmd_type, cmd_value = text.lower().split(';')
+            cmd_type, cmd_value = text.split(';')
             if cmd_type in VALID_COMMANDS and VALID_COMMANDS[cmd_type] is float:
                 try:
                     cmd_value = float(cmd_value)
