@@ -1,70 +1,63 @@
-import requests
-import json
+import requests, json
 from tele_alert import make_alert, send_alert
+from commodity import Commodity
 
-REFERENCE = 11800
-ALERT_TARGET = 11800
-PX_OFFSET_PERCENT = 1
-isALERTED = False
+DEFAULT_REF = 11800.00
+DEFAULT_PX_OFFSET_PERCENT = 1.0
 
-def alerted_reset():
-    global isALERTED
-    isALERTED = False
+class Btc(Commodity):
+    def __init__(self, debug=False):
+        default_dict = {"title": "BTC",
+                        "PX_OFFSET_PERCENT": DEFAULT_PX_OFFSET_PERCENT,
+                        "REFERENCE": DEFAULT_REF}
+        super().__init__(default_dict)
+        self._debug = debug
+        print(f"DEBUG enabled: {self._debug}")
 
-def alerted():
-    global isALERTED
-    isALERTED = True
+    def get_btc(self):
+        res = requests.get('https://blockchain.info/ticker')
+        if res.status_code == 200:
+            btc = json.loads(res.text)
+        return btc["USD"]
 
-def update_alert(value):
-    global ALERT_TARGET
-    ALERT_TARGET = value
+    def analyse(self):
+        price = self.get_btc()["last"]
+        reference = self.get_ref()
+        offset = self.get_percent()
 
-def update_percent(value):
-    global PX_OFFSET_PERCENT
-    PX_OFFSET_PERCENT = value
+        # Evaluate changes
+        change = 100 - 100 * price / reference
+        if change > offset:
+            if self._debug:
+                print('BTC Price dropped {:.2f}% from {}: {}'.format(change, reference, price))
+            else:
+                send_alert([make_alert('BTC Price dropped {:.2f}% from {}: {}'.format(change, reference, price))])
+            self.update_ref(price)
+        elif change < -offset:
+            if self._debug:
+                print('BTC Price rised {:.2f}% from {}: {}'.format(-change, reference, price))
+            else:
+                send_alert([make_alert('BTC Price rised {:.2f}% from {}: {}'.format(-change, reference, price))])
+            self.update_ref(price)
 
-def update_ref(value):
-    global REFERENCE
-    REFERENCE = value
-
-def get_percent():
-    return PX_OFFSET_PERCENT
-
-def get_ref():
-    return REFERENCE
-
-def get_alert():
-    return ALERT_TARGET
-
-def get_btc():
-    res = requests.get('https://blockchain.info/ticker')
-    if res.status_code == 200:
-        btc = json.loads(res.text)
-    return btc["USD"]
-
-def analyse():
-    btc = get_btc()
-    price = btc["last"]
-
-    # Check target alert (fluctuation 10/11800)
-    if not isALERTED and abs(1 - price / ALERT_TARGET) < 10/11800:
-        send_alert([make_alert('Target price reached: tg/cr {}/{}'.format(ALERT_TARGET, price))])
-        alerted()
-
-    # Evaluate changes
-    change = 100 - 100 * price / REFERENCE
-    if change > PX_OFFSET_PERCENT:
-        send_alert([make_alert('BTC Price dropped {:.2f}% from {}: {}'.format(change, REFERENCE, price))])
-        update_ref(price)
-    elif change < -PX_OFFSET_PERCENT:
-        send_alert([make_alert('BTC Price rised {:.2f}% from {}: {}'.format(-change, REFERENCE, price))])
-        update_ref(price)
 
 def main():
-    print(f"Debug get_btc: {get_btc()}")
-    update_ref(1)
-    analyse()
-
+    btc = Btc(debug=True)
+    print(f"DEBUG get_ref: {btc.get_ref()}")
+    print(f"DEBUG get_offset: {btc.get_percent()}")
+    print(f"DEBUG get_btc: {btc.get_btc()}")
+    print(f"DEBUG update_ref(15000): ")
+    btc.update_ref(15000)
+    print(f"DEBUG update_offset(2): ")
+    btc.update_percent(2)
+    print(f"DEBUG get_ref: {btc.get_ref()}")
+    print(f"DEBUG get_offset: {btc.get_percent()}")
+    print(f"DEBUG analyse: ")
+    btc.analyse()
+    print(f"DEBUG update_ref(200): ")
+    btc.update_ref(200)
+    print(f"DEBUG analyse: ")
+    btc.analyse()        
 
 if __name__ == '__main__':
     main()
