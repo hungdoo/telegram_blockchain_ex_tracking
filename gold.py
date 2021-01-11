@@ -24,10 +24,11 @@ class Gold(Commodity):
     def get_gold(self):
         res = requests.get('https://goldseek.com/')
         soup = BeautifulSoup(res.content, 'html.parser')
-        cur_gold = 0.0
+        cur_gold = 1.0
         for tag in soup.find_all('div', 'textquote'):
             if tag.has_attr('data-symbol') and tag.attrs['data-symbol'] == 'XAUUSD':
                 cur_gold = self._extract_gold_buy(tag)
+                break
         return cur_gold
 
     def analyse(self):
@@ -40,13 +41,13 @@ class Gold(Commodity):
             if self._debug:
                 print('Gold Price dropped {:.2f}% from {}: {}'.format(change, reference, cur_gold))
             else:
-                send_alert([make_alert('Gold Price dropped {:.2f}% from {}: {}'.format(change, reference, cur_gold))])
+                send_alert([make_alert('`Gold` Price dropped `{:.2f}%` from {}: {}'.format(change, reference, cur_gold))])
             self.update_ref(cur_gold)
         elif change < -offset:
             if self._debug:
                 print('Gold Price rised {:.2f}% from {}: {}'.format(-change, reference, cur_gold))
             else:
-                send_alert([make_alert('Gold Price rised {:.2f}% from {}: {}'.format(-change, reference, cur_gold))])
+                send_alert([make_alert('`Gold` Price rised `{:.2f}%` from {}: {}'.format(-change, reference, cur_gold))])
             self.update_ref(cur_gold)
 
 

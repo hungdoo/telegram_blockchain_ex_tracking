@@ -18,7 +18,9 @@ class Btc(Commodity):
         res = requests.get('https://blockchain.info/ticker')
         if res.status_code == 200:
             btc = json.loads(res.text)
-        return btc["USD"]
+            return btc["USD"]   
+        else:
+            return 1.0
 
     def analyse(self):
         price = self.get_btc()["last"]
@@ -31,13 +33,13 @@ class Btc(Commodity):
             if self._debug:
                 print('BTC Price dropped {:.2f}% from {}: {}'.format(change, reference, price))
             else:
-                send_alert([make_alert('BTC Price dropped {:.2f}% from {}: {}'.format(change, reference, price))])
+                send_alert([make_alert('*BTC* Price dropped *{:.2f}%* from {}: {}'.format(change, reference, price))])
             self.update_ref(price)
         elif change < -offset:
             if self._debug:
                 print('BTC Price rised {:.2f}% from {}: {}'.format(-change, reference, price))
             else:
-                send_alert([make_alert('BTC Price rised {:.2f}% from {}: {}'.format(-change, reference, price))])
+                send_alert([make_alert('*BTC* Price rised *{:.2f}%* from {}: {}'.format(-change, reference, price))])
             self.update_ref(price)
 
 
@@ -59,5 +61,10 @@ def main():
     print(f"DEBUG analyse: ")
     btc.analyse()        
 
+def test():
+    send_alert([make_alert('`1dsada` **dasdas** `fdafasd`')])
+    # send_alert([make_alert('BTC* Price dropped `{:.2f}%` from {}: {}'.format(11.2))])
+
 if __name__ == '__main__':
-    main()
+    # main()
+    test()
