@@ -20,10 +20,12 @@ class Btc(Commodity):
             btc = json.loads(res.text)
             return btc["USD"]   
         else:
-            return 1.0
+            return 0.0
 
     def analyse(self):
         price = self.get_btc()["last"]
+        if price == 0.0:
+            return
         reference = self.get_ref()
         offset = self.get_percent()
 

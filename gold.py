@@ -24,7 +24,7 @@ class Gold(Commodity):
     def get_gold(self):
         res = requests.get('https://goldseek.com/')
         soup = BeautifulSoup(res.content, 'html.parser')
-        cur_gold = 1.0
+        cur_gold = 0.0
         for tag in soup.find_all('div', 'textquote'):
             if tag.has_attr('data-symbol') and tag.attrs['data-symbol'] == 'XAUUSD':
                 cur_gold = self._extract_gold_buy(tag)
@@ -33,6 +33,8 @@ class Gold(Commodity):
 
     def analyse(self):
         cur_gold = self.get_gold()
+        if cur_gold == 0.0:
+            return
         reference = self.get_ref()
         offset = self.get_percent()
 
